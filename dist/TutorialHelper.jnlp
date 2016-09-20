@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="TutorialHelper.jnlp">
+  <information>
+    <title>TutorialHelper</title>
+    <vendor>jakob</vendor>
+    <description>null</description>
+    <offline-allowed/>
+  </information>
+  <resources>
+    <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="TutorialHelper.jar" size="7000" download="eager" />
+    <jar href="lib\jna-4.2.2.jar" size="1137286" download="eager" />
+    <jar href="lib\jna-platform-4.2.2.jar" size="1856200" download="eager" />
+    <jar href="lib\jnativehook-2.0.3.jar" size="193421" download="eager" />
+  </resources>
+  <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="TutorialHelper" >
+    <param name="requiredFXVersion" value="8.0+"/>
+  </applet-desc>
+  <jfx:javafx-desc  width="800" height="600" main-class="tutorialhelper.TutorialHelper"  name="TutorialHelper" />
+  <update check="always"/>
+</jnlp>
