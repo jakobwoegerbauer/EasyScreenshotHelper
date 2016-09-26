@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package tutorialhelper;
+package easyscreenshothelper;
 
 import com.sun.jna.Native;
 import com.sun.jna.platform.win32.User32;

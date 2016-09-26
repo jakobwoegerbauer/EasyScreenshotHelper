@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package tutorialhelper;
+package easyscreenshothelper;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,7 +22,7 @@ import org.jnativehook.NativeHookException;
  *
  * @author jakob
  */
-public class TutorialHelper extends Application {
+public class EasyScreenshotHelper extends Application {
 
 	private HelperStateManager stateManager;
 
@@ -41,7 +41,7 @@ public class TutorialHelper extends Application {
 			try {
 				run();
 			} catch (Exception ex) {
-				Logger.getLogger(TutorialHelper.class.getName()).log(Level.SEVERE, null, ex);
+				Logger.getLogger(EasyScreenshotHelper.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		});
 		Button btnClose = new Button();
@@ -50,7 +50,7 @@ public class TutorialHelper extends Application {
 			try {
 				GlobalScreen.unregisterNativeHook();
 			} catch (NativeHookException ex) {
-				Logger.getLogger(TutorialHelper.class.getName()).log(Level.SEVERE, null, ex);
+				Logger.getLogger(EasyScreenshotHelper.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		});
 		btnClose.setTranslateY(50);
@@ -64,7 +64,7 @@ public class TutorialHelper extends Application {
 			try {
 				GlobalScreen.unregisterNativeHook();
 			} catch (NativeHookException ex) {
-				Logger.getLogger(TutorialHelper.class.getName()).log(Level.SEVERE, null, ex);
+				Logger.getLogger(EasyScreenshotHelper.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		});
 		primaryStage.show();
