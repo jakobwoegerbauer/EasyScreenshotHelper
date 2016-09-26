@@ -13,10 +13,12 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
+import java.io.File;
 
 /**
  *
@@ -39,7 +41,12 @@ public class EasyScreenshotHelper extends Application {
 		btn.setText("Run");
 		btn.setOnAction((ActionEvent event) -> {
 			try {
-				run();
+				DirectoryChooser dc = new DirectoryChooser();
+				dc.setTitle("Where do you want the screenshots to be saved in?");
+				File selectedDirectory = dc.showDialog(primaryStage);
+				if (selectedDirectory.exists() && selectedDirectory.canWrite()) {
+					run(selectedDirectory.getAbsolutePath());
+				}
 			} catch (Exception ex) {
 				Logger.getLogger(EasyScreenshotHelper.class.getName()).log(Level.SEVERE, null, ex);
 			}
@@ -68,10 +75,9 @@ public class EasyScreenshotHelper extends Application {
 			}
 		});
 		primaryStage.show();
-
 	}
 
-	private void run() throws Exception {
+	private void run(String saveDirectory) throws Exception {
 		try {
 			GlobalScreen.registerNativeHook();
 		} catch (NativeHookException ex) {
@@ -83,7 +89,7 @@ public class EasyScreenshotHelper extends Application {
 
 		Configuration config = new Configuration();
 		config.setKeyCode(43);
-		stateManager = new HelperStateManager();
+		stateManager = new HelperStateManager(saveDirectory);
 
 		GlobalMouseListener mouseListener = new GlobalMouseListener();
 		GlobalKeyListener keyListener = new GlobalKeyListener(config);
