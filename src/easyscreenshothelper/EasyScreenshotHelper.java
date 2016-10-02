@@ -5,6 +5,8 @@
  */
 package easyscreenshothelper;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
@@ -19,6 +21,12 @@ import javafx.stage.WindowEvent;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import java.io.File;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import javafx.application.Platform;
+import javafx.scene.input.KeyCode;
+import org.jnativehook.keyboard.NativeKeyEvent;
 
 /**
  *
@@ -27,9 +35,13 @@ import java.io.File;
 public class EasyScreenshotHelper extends Application {
 
 	private HelperStateManager stateManager;
+	private Stage stage;
+	private ScheduledExecutorService executerService;
+	private double defaultY;
 
 	@Override
-	public void start(Stage primaryStage) {
+	public void start(Stage stage) {
+		this.stage = stage;
 		// Get the logger for "org.jnativehook" and set the level to warning.
 		Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
 		logger.setLevel(Level.WARNING);
@@ -43,7 +55,7 @@ public class EasyScreenshotHelper extends Application {
 			try {
 				DirectoryChooser dc = new DirectoryChooser();
 				dc.setTitle("Where do you want the screenshots to be saved in?");
-				File selectedDirectory = dc.showDialog(primaryStage);
+				File selectedDirectory = dc.showDialog(stage);
 				if (selectedDirectory.exists() && selectedDirectory.canWrite()) {
 					run(selectedDirectory.getAbsolutePath());
 				}
@@ -54,27 +66,24 @@ public class EasyScreenshotHelper extends Application {
 		Button btnClose = new Button();
 		btnClose.setText("Stop");
 		btnClose.setOnAction((ActionEvent) -> {
-			try {
-				GlobalScreen.unregisterNativeHook();
-			} catch (NativeHookException ex) {
-				Logger.getLogger(EasyScreenshotHelper.class.getName()).log(Level.SEVERE, null, ex);
-			}
+			Platform.exit();
 		});
 		btnClose.setTranslateY(50);
 
 		StackPane root = new StackPane();
 		root.getChildren().addAll(btn, btnClose);
 		Scene scene = new Scene(root, 300, 250);
-		primaryStage.setTitle("Hello World!");
-		primaryStage.setScene(scene);
-		primaryStage.setOnCloseRequest((WindowEvent event) -> {
+		stage.setTitle("Hello World!");
+		stage.setScene(scene);
+		stage.setOnCloseRequest((WindowEvent event) -> {
 			try {
 				GlobalScreen.unregisterNativeHook();
 			} catch (NativeHookException ex) {
 				Logger.getLogger(EasyScreenshotHelper.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		});
-		primaryStage.show();
+		stage.show();
+		defaultY = stage.getY();
 	}
 
 	private void run(String saveDirectory) throws Exception {
@@ -83,13 +92,12 @@ public class EasyScreenshotHelper extends Application {
 		} catch (NativeHookException ex) {
 			System.err.println("There was a problem registering the native hook.");
 			System.err.println(ex.getMessage());
-
-			System.exit(1);
+			Platform.exit();
 		}
 
 		Configuration config = new Configuration();
-		config.setKeyCode(43);
-		stateManager = new HelperStateManager(saveDirectory);
+		config.setKeyCode(NativeKeyEvent.VC_SPACE);
+		stateManager = new HelperStateManager(saveDirectory, this);
 
 		GlobalMouseListener mouseListener = new GlobalMouseListener();
 		GlobalKeyListener keyListener = new GlobalKeyListener(config);
@@ -97,6 +105,44 @@ public class EasyScreenshotHelper extends Application {
 		keyListener.addObserver(stateManager);
 		GlobalScreen.addNativeMouseListener(mouseListener);
 		GlobalScreen.addNativeKeyListener(keyListener);
+
+		executerService = Executors.newScheduledThreadPool(1);
+		stage.setIconified(true);
+	}
+
+	@Override
+	public void stop() throws Exception {
+		try {
+			GlobalScreen.unregisterNativeHook();
+			Logger.getLogger("Main").log(Level.INFO, "unregistered global hook");
+		} catch (NativeHookException ex) {
+			Logger.getLogger(EasyScreenshotHelper.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		executerService.shutdown();
+		super.stop();
+	}
+
+	public void onScreenshotSaved() {
+		Platform.runLater(() -> {
+			stage.toFront();  // let task icon blink
+			Logger.getLogger("Main").log(Level.INFO, "screenshot saved");
+		});
+
+		executerService.schedule(() -> {
+			Platform.runLater(() -> {
+				Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+				stage.setY(screenSize.getHeight()-60);
+				stage.setIconified(false);
+			});
+		}, 500, TimeUnit.MILLISECONDS);
+
+		executerService.schedule(() -> {
+			Platform.runLater(() -> {
+				stage.setY(defaultY);
+				stage.setIconified(true);
+			});
+		}, 1000, TimeUnit.MILLISECONDS);
+
 	}
 
 	/**

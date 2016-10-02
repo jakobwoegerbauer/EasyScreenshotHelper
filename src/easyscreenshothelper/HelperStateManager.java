@@ -22,13 +22,15 @@ import org.jnativehook.mouse.NativeMouseEvent;
  */
 public class HelperStateManager implements Observer {
 
+	private EasyScreenshotHelper main;
 	private String saveDirectory;
 	private BufferedImage lastScreenshot;
 	private Point lastPosition;
 	private int count = 0;
-	
-	public HelperStateManager(String saveDirectory) {
+
+	public HelperStateManager(String saveDirectory, EasyScreenshotHelper main) {
 		this.saveDirectory = saveDirectory;
+		this.main = main;
 	}
 
 	@Override
@@ -36,9 +38,12 @@ public class HelperStateManager implements Observer {
 		try {
 			if (o.getClass().equals(GlobalMouseListener.class)) {
 				lastScreenshot = ScreenshotHelper.takeScreenshot();
-				lastPosition = ((NativeMouseEvent)arg).getPoint();
-			} else {
+				lastPosition = ((NativeMouseEvent) arg).getPoint();
+			} else if (lastScreenshot != null) {
 				saveImage(lastScreenshot, new File(saveDirectory + File.separator + (++count) + ".png"));
+				lastScreenshot = null;
+				main.onScreenshotSaved();
+				
 			}
 		} catch (Exception e) {
 			Logger.getLogger(HelperStateManager.class.getName()).log(Level.SEVERE, null, e);

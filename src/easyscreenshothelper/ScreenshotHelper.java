@@ -13,6 +13,8 @@ import java.awt.Dimension;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -24,7 +26,12 @@ public class ScreenshotHelper {
 		HWND hwnd = User32.INSTANCE.GetForegroundWindow();
 		RECT rect = new RECT();
 		User32.INSTANCE.GetWindowRect(hwnd, rect);
-		BufferedImage image = new Robot().createScreenCapture(rect.toRectangle());
-		return image;		
+		BufferedImage image = null;
+		try {
+			image = new Robot().createScreenCapture(rect.toRectangle());
+		} catch (Exception e) {
+			Logger.getLogger("ScreenshotHelper").log(Level.WARNING, "rectangle height is zero");
+		}
+		return image;
 	}
 }
