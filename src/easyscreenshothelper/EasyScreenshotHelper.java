@@ -5,13 +5,10 @@
  */
 package easyscreenshothelper;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
@@ -26,7 +23,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
+import javafx.scene.control.CheckBox;
 import org.jnativehook.keyboard.NativeKeyEvent;
 
 /**
@@ -60,6 +57,13 @@ public class EasyScreenshotHelper extends Application {
 	private void createUi(Stage stage) {
 		stage.getIcons().add(new Image(this.getClass().getResourceAsStream("photo-camera.png")));
 
+		CheckBox chbox = new CheckBox("save every screenshot");
+		chbox.setVisible(false);
+		chbox.setTranslateY(50);
+		chbox.setOnAction((ActionEvent e) -> {
+			stateManager.setSaveAll(chbox.isSelected());
+		});
+		
 		Button btn = new Button();
 		btn.setText("Run");
 		btn.setOnAction((ActionEvent event) -> {
@@ -69,6 +73,7 @@ public class EasyScreenshotHelper extends Application {
 				File selectedDirectory = dc.showDialog(stage);
 				if (selectedDirectory.exists() && selectedDirectory.canWrite()) {
 					run(selectedDirectory.getAbsolutePath());
+					chbox.setVisible(true);
 				}
 			} catch (Exception ex) {
 				Logger.getLogger(EasyScreenshotHelper.class.getName()).log(Level.SEVERE, null, ex);
@@ -79,10 +84,13 @@ public class EasyScreenshotHelper extends Application {
 		btnClose.setOnAction((ActionEvent) -> {
 			Platform.exit();
 		});
-		btnClose.setTranslateY(50);
+		btnClose.setTranslateY(25);
+		
+		 
+		
 
 		StackPane root = new StackPane();
-		root.getChildren().addAll(btn, btnClose);
+		root.getChildren().addAll(btn, btnClose, chbox);
 		Scene scene = new Scene(root, 300, 250);
 		stage.setTitle("EasyScreenshotHelper");
 		stage.setScene(scene);
@@ -105,10 +113,10 @@ public class EasyScreenshotHelper extends Application {
 			System.err.println(ex.getMessage());
 			Platform.exit();
 		}
-
+		stateManager = new HelperStateManager(saveDirectory, this);	
+		
 		Configuration config = new Configuration();
 		config.setKeyCode(NativeKeyEvent.VC_SPACE);
-		stateManager = new HelperStateManager(saveDirectory, this);
 
 		GlobalMouseListener mouseListener = new GlobalMouseListener();
 		GlobalKeyListener keyListener = new GlobalKeyListener(config);

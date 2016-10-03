@@ -6,6 +6,7 @@
 package easyscreenshothelper;
 
 import java.awt.Point;
+import java.awt.event.ItemEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +28,9 @@ public class HelperStateManager implements Observer {
 	private BufferedImage lastScreenshot;
 	private Point lastPosition;
 	private int count = 0;
-
+	private boolean saveAll;
+	private boolean setSaveAll;
+	
 	public HelperStateManager(String saveDirectory, EasyScreenshotHelper main) {
 		this.saveDirectory = saveDirectory;
 		this.main = main;
@@ -39,12 +42,18 @@ public class HelperStateManager implements Observer {
 			if (o.getClass().equals(GlobalMouseListener.class)) {
 				lastScreenshot = ScreenshotHelper.takeScreenshot();
 				lastPosition = ((NativeMouseEvent) arg).getPoint();
+				if(saveAll && lastScreenshot != null){
+					saveImage(lastScreenshot, new File(saveDirectory + File.separator + (++count) + ".png"));
+					lastScreenshot = null;
+					main.onScreenshotSaved();
+				}
 			} else if (lastScreenshot != null) {
 				saveImage(lastScreenshot, new File(saveDirectory + File.separator + (++count) + ".png"));
 				lastScreenshot = null;
 				main.onScreenshotSaved();
 				
 			}
+			saveAll = setSaveAll;
 		} catch (Exception e) {
 			Logger.getLogger(HelperStateManager.class.getName()).log(Level.SEVERE, null, e);
 		}
@@ -53,5 +62,12 @@ public class HelperStateManager implements Observer {
 	private void saveImage(BufferedImage image, File file) throws IOException {
 		ImageIO.write(image, "png", file);
 		//TODO mark lastPoint on image
+	}
+
+	void setSaveAll(boolean save) {
+		setSaveAll = save;
+		if(!save){
+			saveAll = save;
+		}
 	}
 }
