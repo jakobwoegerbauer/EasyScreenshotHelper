@@ -56,7 +56,6 @@ public class EasyScreenshotHelper extends Application {
 	}
 
 	private void createUi(Stage stage) {
-		stage.getIcons().add(new Image(this.getClass().getResourceAsStream("rekt.JPG")));
 		Button btn = new Button();
 		btn.setText("Run");
 		btn.setOnAction((ActionEvent event) -> {
