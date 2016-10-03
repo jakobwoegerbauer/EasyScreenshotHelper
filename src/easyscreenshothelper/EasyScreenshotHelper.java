@@ -49,6 +49,10 @@ public class EasyScreenshotHelper extends Application {
 		// Don't forget to disable the parent handlers.
 		logger.setUseParentHandlers(false);
 
+		createUi(stage);
+	}
+	
+	private void createUi(Stage stage) {
 		Button btn = new Button();
 		btn.setText("Run");
 		btn.setOnAction((ActionEvent event) -> {
@@ -73,7 +77,7 @@ public class EasyScreenshotHelper extends Application {
 		StackPane root = new StackPane();
 		root.getChildren().addAll(btn, btnClose);
 		Scene scene = new Scene(root, 300, 250);
-		stage.setTitle("Hello World!");
+		stage.setTitle("EasyScreenshotHelper");
 		stage.setScene(scene);
 		stage.setOnCloseRequest((WindowEvent event) -> {
 			try {
