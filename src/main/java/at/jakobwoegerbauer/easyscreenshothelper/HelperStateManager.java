@@ -40,8 +40,7 @@ public class HelperStateManager implements Observer {
 	public void update(Observable o, Object arg) {
 		try {
 			if (o.getClass().equals(GlobalMouseListener.class)) {
-				lastScreenshot = ScreenshotHelper.takeScreenshot();
-				lastPosition = ((NativeMouseEvent) arg).getPoint();
+				lastScreenshot = ScreenshotHelper.takeScreenshot(((NativeMouseEvent) arg).getPoint());
 				if(saveAll && lastScreenshot != null){
 					saveImage(lastScreenshot, new File(saveDirectory + File.separator + (++count) + ".png"));
 					lastScreenshot = null;

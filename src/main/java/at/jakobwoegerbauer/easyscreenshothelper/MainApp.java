@@ -117,7 +117,7 @@ public class MainApp extends Application {
 		stateManager = new HelperStateManager(saveDirectory, this);	
 		
 		Configuration config = new Configuration();
-		config.setKeyCode(NativeKeyEvent.VC_SPACE);
+		config.setKeyCode(NativeKeyEvent.VC_D);
 
 		GlobalMouseListener mouseListener = new GlobalMouseListener();
 		GlobalKeyListener keyListener = new GlobalKeyListener(config);
