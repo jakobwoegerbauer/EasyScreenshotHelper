@@ -25,6 +25,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import javafx.application.Platform;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import org.jnativehook.keyboard.NativeKeyEvent;
 
@@ -49,10 +50,13 @@ public class EasyScreenshotHelper extends Application {
 		// Don't forget to disable the parent handlers.
 		logger.setUseParentHandlers(false);
 
+		executerService = Executors.newScheduledThreadPool(1);
+
 		createUi(stage);
 	}
-	
+
 	private void createUi(Stage stage) {
+		stage.getIcons().add(new Image(this.getClass().getResourceAsStream("rekt.JPG")));
 		Button btn = new Button();
 		btn.setText("Run");
 		btn.setOnAction((ActionEvent event) -> {
@@ -110,7 +114,6 @@ public class EasyScreenshotHelper extends Application {
 		GlobalScreen.addNativeMouseListener(mouseListener);
 		GlobalScreen.addNativeKeyListener(keyListener);
 
-		executerService = Executors.newScheduledThreadPool(1);
 		stage.setIconified(true);
 	}
 
@@ -127,26 +130,34 @@ public class EasyScreenshotHelper extends Application {
 	}
 
 	public void onScreenshotSaved() {
+		final ObjectWrapper<Image> defaultIconWrapper = new ObjectWrapper<>();
 		Platform.runLater(() -> {
-			stage.toFront();  // let task icon blink
-			Logger.getLogger("Main").log(Level.INFO, "screenshot saved");
+			stage.getIcons().add(new Image(this.getClass().getResourceAsStream("notify1.jpg")));
 		});
-
+		int timing = 300;
+		int limit = 6;
+		for (int i = 1; i <= limit; i++) {
+			if (i % 2 == 1) {
+				executerService.schedule(() -> {
+					Platform.runLater(() -> {
+						stage.getIcons().remove(1);
+						stage.getIcons().add(new Image(this.getClass().getResourceAsStream("notify2.jpg")));
+					});
+				}, timing * i, TimeUnit.MILLISECONDS);
+			} else {
+				executerService.schedule(() -> {
+					Platform.runLater(() -> {
+						stage.getIcons().remove(1);
+						stage.getIcons().add(new Image(this.getClass().getResourceAsStream("notify1.jpg")));
+					});
+				}, timing * i, TimeUnit.MILLISECONDS);
+			}
+		}
 		executerService.schedule(() -> {
 			Platform.runLater(() -> {
-				Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-				stage.setY(screenSize.getHeight()-60);
-				stage.setIconified(false);
+				stage.getIcons().remove(1);
 			});
-		}, 500, TimeUnit.MILLISECONDS);
-
-		executerService.schedule(() -> {
-			Platform.runLater(() -> {
-				stage.setY(defaultY);
-				stage.setIconified(true);
-			});
-		}, 1000, TimeUnit.MILLISECONDS);
-
+		}, timing * (limit + 1), TimeUnit.MILLISECONDS);
 	}
 
 	/**

@@ -8,6 +8,7 @@ package easyscreenshothelper;
 import java.util.Observable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.input.KeyEvent;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
@@ -19,11 +20,11 @@ public class GlobalKeyListener extends Observable implements NativeKeyListener {
 	private final int keyCode;
 	private boolean controlDown;
 	
-	private static final int CONTROL_KEY = 29;
+	private static final int CONTROL_KEY = 29; //0xA4; //29;
 	
 	public GlobalKeyListener(Configuration config){
 		this.keyCode = config.getKeyCode();
-		this.controlDown = false;
+		this.controlDown = false; 
 	}
 	
 	@Override
