@@ -39,19 +39,20 @@ public class ScreenshotHelper {
 		}
 		if(image != null){
 			Graphics2D g = image.createGraphics();
-			g.setColor(new Color(255, 0, 0, 200));
-			g.setStroke(new BasicStroke(2));
-			g.drawOval(mousePosition.x - rectangle.x - RADIUS,
-					mousePosition.y - rectangle.y - RADIUS, 2*RADIUS, 2*RADIUS);
 			
-			g.setColor(Color.BLACK.brighter());
-			g.drawOval(mousePosition.x - rectangle.x - RADIUS/8,
-					mousePosition.y - rectangle.y - RADIUS/8, RADIUS/4,RADIUS/4);
+			g.setStroke(new BasicStroke(1));
+
+			g.setColor(new Color(255, 0, 0, 100));
+			g.drawOval(mousePosition.x - rectangle.x - 3*RADIUS,
+					mousePosition.y - rectangle.y - 3*RADIUS, 6*RADIUS, 6*RADIUS);
 			
-			g.setColor(Color.black);
-			g.drawOval(mousePosition.x - rectangle.x - RADIUS/4,
+			g.setColor(new Color(255, 0, 0, 100));			
+			g.fillOval(mousePosition.x - rectangle.x - RADIUS,
+					mousePosition.y - rectangle.y - RADIUS, 2*RADIUS, 2*RADIUS);			
+			
+			g.setColor(Color.BLACK);
+			g.fillOval(mousePosition.x - rectangle.x - RADIUS/4,
 					mousePosition.y - rectangle.y - RADIUS/4, RADIUS/2,RADIUS/2);
-			
 		}
 		return image;
 	}
