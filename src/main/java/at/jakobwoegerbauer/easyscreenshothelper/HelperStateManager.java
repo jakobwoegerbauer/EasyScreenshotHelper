@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package easyscreenshothelper;
+package at.jakobwoegerbauer.easyscreenshothelper;
 
 import java.awt.Point;
 import java.awt.event.ItemEvent;
@@ -23,7 +23,7 @@ import org.jnativehook.mouse.NativeMouseEvent;
  */
 public class HelperStateManager implements Observer {
 
-	private EasyScreenshotHelper main;
+	private MainApp main;
 	private String saveDirectory;
 	private BufferedImage lastScreenshot;
 	private Point lastPosition;
@@ -31,7 +31,7 @@ public class HelperStateManager implements Observer {
 	private boolean saveAll;
 	private boolean setSaveAll;
 	
-	public HelperStateManager(String saveDirectory, EasyScreenshotHelper main) {
+	public HelperStateManager(String saveDirectory, MainApp main) {
 		this.saveDirectory = saveDirectory;
 		this.main = main;
 	}

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package easyscreenshothelper;
+package at.jakobwoegerbauer.easyscreenshothelper;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,26 +18,28 @@ import javafx.stage.WindowEvent;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import java.io.File;
+import java.net.URL;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.control.CheckBox;
+import javax.imageio.ImageIO;
 import org.jnativehook.keyboard.NativeKeyEvent;
 
 /**
  *
  * @author jakob
  */
-public class EasyScreenshotHelper extends Application {
+public class MainApp extends Application {
 
 	private HelperStateManager stateManager;
 	private Stage stage;
 	private ScheduledExecutorService executerService;
-	private double defaultY;
-	private final Image ICON_NOTIFY1 = new Image(this.getClass().getResourceAsStream("notify1.jpg"));
-	private final Image ICON_NOTIFY2 = new Image(this.getClass().getResourceAsStream("notify2.jpg"));
+	
+	private final Image ICON_NOTIFY1 = new Image("notify1.jpg");
+	private final Image ICON_NOTIFY2 = new Image("notify2.jpg");
 
 	@Override
 	public void start(Stage stage) {
@@ -55,7 +57,7 @@ public class EasyScreenshotHelper extends Application {
 	}
 
 	private void createUi(Stage stage) {
-		stage.getIcons().add(new Image(this.getClass().getResourceAsStream("photo-camera.png")));
+		stage.getIcons().add(new Image("photo-camera.png"));
 
 		CheckBox chbox = new CheckBox("save every screenshot");
 		chbox.setVisible(false);
@@ -76,7 +78,7 @@ public class EasyScreenshotHelper extends Application {
 					chbox.setVisible(true);
 				}
 			} catch (Exception ex) {
-				Logger.getLogger(EasyScreenshotHelper.class.getName()).log(Level.SEVERE, null, ex);
+				Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		});
 		Button btnClose = new Button();
@@ -98,11 +100,10 @@ public class EasyScreenshotHelper extends Application {
 			try {
 				GlobalScreen.unregisterNativeHook();
 			} catch (NativeHookException ex) {
-				Logger.getLogger(EasyScreenshotHelper.class.getName()).log(Level.SEVERE, null, ex);
+				Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		});
 		stage.show();
-		defaultY = stage.getY();
 	}
 
 	private void run(String saveDirectory) throws Exception {
@@ -134,7 +135,7 @@ public class EasyScreenshotHelper extends Application {
 			GlobalScreen.unregisterNativeHook();
 			Logger.getLogger("Main").log(Level.INFO, "unregistered global hook");
 		} catch (NativeHookException ex) {
-			Logger.getLogger(EasyScreenshotHelper.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
 		}
 		executerService.shutdown();
 		super.stop();

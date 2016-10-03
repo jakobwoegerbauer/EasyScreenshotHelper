@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package easyscreenshothelper;
+package at.jakobwoegerbauer.easyscreenshothelper;
 
 import java.util.Observable;
 import org.jnativehook.mouse.NativeMouseEvent;
