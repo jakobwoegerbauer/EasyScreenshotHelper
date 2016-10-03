@@ -39,6 +39,8 @@ public class EasyScreenshotHelper extends Application {
 	private Stage stage;
 	private ScheduledExecutorService executerService;
 	private double defaultY;
+	private final Image ICON_NOTIFY1 = new Image(this.getClass().getResourceAsStream("notify1.jpg"));
+	private final Image ICON_NOTIFY2 = new Image(this.getClass().getResourceAsStream("notify2.jpg"));
 
 	@Override
 	public void start(Stage stage) {
@@ -56,6 +58,8 @@ public class EasyScreenshotHelper extends Application {
 	}
 
 	private void createUi(Stage stage) {
+		stage.getIcons().add(new Image(this.getClass().getResourceAsStream("photo-camera.png")));
+
 		Button btn = new Button();
 		btn.setText("Run");
 		btn.setOnAction((ActionEvent event) -> {
@@ -129,32 +133,36 @@ public class EasyScreenshotHelper extends Application {
 	}
 
 	public void onScreenshotSaved() {
-		final ObjectWrapper<Image> defaultIconWrapper = new ObjectWrapper<>();
+		Logger.getLogger("Main").log(Level.INFO, "onScreenshotSaved()");
+		final ObjectWrapper<Image> defaultImageWrapper = new ObjectWrapper<>();
+		
 		Platform.runLater(() -> {
-			stage.getIcons().add(new Image(this.getClass().getResourceAsStream("notify1.jpg")));
+			defaultImageWrapper.setValue(stage.getIcons().remove(0));
+			stage.getIcons().add(ICON_NOTIFY1);
 		});
-		int timing = 300;
-		int limit = 6;
+		int timing = 175;
+		int limit = 4;
 		for (int i = 1; i <= limit; i++) {
 			if (i % 2 == 1) {
 				executerService.schedule(() -> {
 					Platform.runLater(() -> {
-						stage.getIcons().remove(1);
-						stage.getIcons().add(new Image(this.getClass().getResourceAsStream("notify2.jpg")));
+						stage.getIcons().remove(0);
+						stage.getIcons().add(ICON_NOTIFY2);
 					});
 				}, timing * i, TimeUnit.MILLISECONDS);
 			} else {
 				executerService.schedule(() -> {
 					Platform.runLater(() -> {
-						stage.getIcons().remove(1);
-						stage.getIcons().add(new Image(this.getClass().getResourceAsStream("notify1.jpg")));
+						stage.getIcons().remove(0);
+						stage.getIcons().add(ICON_NOTIFY1);
 					});
 				}, timing * i, TimeUnit.MILLISECONDS);
 			}
 		}
 		executerService.schedule(() -> {
 			Platform.runLater(() -> {
-				stage.getIcons().remove(1);
+				stage.getIcons().remove(0);
+				stage.getIcons().add(defaultImageWrapper.getValue());
 			});
 		}, timing * (limit + 1), TimeUnit.MILLISECONDS);
 	}
