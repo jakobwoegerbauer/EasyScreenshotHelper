@@ -18,14 +18,12 @@ import javafx.stage.WindowEvent;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import java.io.File;
-import java.net.URL;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.control.CheckBox;
-import javax.imageio.ImageIO;
 import org.jnativehook.keyboard.NativeKeyEvent;
 
 /**
@@ -37,11 +35,11 @@ public class MainApp extends Application {
 	private HelperStateManager stateManager;
 	private Stage stage;
 	private NotificationHelper notificationHelper;
+	private CheckBox chboxSaveAll;
 
 	@Override
 	public void start(Stage stage) {
 		this.stage = stage;
-		this.notificationHelper = new NotificationHelper(stage);
 		
 		// Get the logger for "org.jnativehook" and set the level to warning.
 		Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
@@ -49,20 +47,19 @@ public class MainApp extends Application {
 
 		// Don't forget to disable the parent handlers.
 		logger.setUseParentHandlers(false);
-
 		createUi(stage);
 	}
 
 	private void createUi(Stage stage) {
 		stage.getIcons().add(new Image("photo-camera.png"));
 
-		CheckBox chbox = new CheckBox("save every screenshot");
-		chbox.setVisible(false);
-		chbox.setTranslateY(50);
-		chbox.setOnAction((ActionEvent e) -> {
-			stateManager.setSaveAll(chbox.isSelected());
+		chboxSaveAll = new CheckBox("save every screenshot");
+		chboxSaveAll.setVisible(false);
+		chboxSaveAll.setTranslateY(50);
+		chboxSaveAll.setOnAction((ActionEvent e) -> {
+			stateManager.setSaveAll(chboxSaveAll.isSelected());
 		});
-		
+
 		Button btn = new Button();
 		btn.setText("Run");
 		btn.setOnAction((ActionEvent event) -> {
@@ -72,7 +69,7 @@ public class MainApp extends Application {
 				File selectedDirectory = dc.showDialog(stage);
 				if (selectedDirectory.exists() && selectedDirectory.canWrite()) {
 					run(selectedDirectory.getAbsolutePath());
-					chbox.setVisible(true);
+					chboxSaveAll.setVisible(true);
 				}
 			} catch (Exception ex) {
 				Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
@@ -81,15 +78,12 @@ public class MainApp extends Application {
 		Button btnClose = new Button();
 		btnClose.setText("Stop");
 		btnClose.setOnAction((ActionEvent) -> {
-			Platform.exit();
+			stopRunner();
 		});
 		btnClose.setTranslateY(25);
-		
-		 
-		
 
 		StackPane root = new StackPane();
-		root.getChildren().addAll(btn, btnClose, chbox);
+		root.getChildren().addAll(btn, btnClose, chboxSaveAll);
 		Scene scene = new Scene(root, 300, 250);
 		stage.setTitle("EasyScreenshotHelper");
 		stage.setScene(scene);
@@ -111,8 +105,9 @@ public class MainApp extends Application {
 			System.err.println(ex.getMessage());
 			Platform.exit();
 		}
-		stateManager = new HelperStateManager(saveDirectory, this);	
-		
+		stateManager = new HelperStateManager(saveDirectory, this);
+		this.notificationHelper = new NotificationHelper(stage);
+
 		Configuration config = new Configuration();
 		config.setKeyCode(NativeKeyEvent.VC_D);
 
@@ -126,15 +121,20 @@ public class MainApp extends Application {
 		stage.setIconified(true);
 	}
 
-	@Override
-	public void stop() throws Exception {
+	private void stopRunner() {
 		try {
 			GlobalScreen.unregisterNativeHook();
 			Logger.getLogger("Main").log(Level.INFO, "unregistered global hook");
+			chboxSaveAll.setVisible(false);
+			notificationHelper.dispose();
 		} catch (NativeHookException ex) {
 			Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
 		}
-		notificationHelper.dispose();
+	}
+
+	@Override
+	public void stop() throws Exception {
+		stopRunner();
 		super.stop();
 	}
 
