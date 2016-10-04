@@ -45,7 +45,7 @@ public class NotificationHelper {
 		if (lastNotificationEnd_ms < System.currentTimeMillis()) { // no current notification
 			notifyUser(blinkspeed_ms, blinks, /* timout_ms: */ 0);
 		} else { // delay notification
-			long timeout_ms = lastNotificationEnd_ms + NOTIFICATION_DELAY_MS;
+			long timeout_ms = lastNotificationEnd_ms - System.currentTimeMillis() + NOTIFICATION_DELAY_MS;
 			long duration_ms = blinkspeed_ms * blinks - timeout_ms;
 			blinks = (int)(duration_ms / blinkspeed_ms) + 1;
 			notifyUser(blinkspeed_ms, blinks, timeout_ms);
