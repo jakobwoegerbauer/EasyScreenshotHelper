@@ -36,22 +36,19 @@ public class MainApp extends Application {
 
 	private HelperStateManager stateManager;
 	private Stage stage;
-	private ScheduledExecutorService executerService;
-	
-	private final Image ICON_NOTIFY1 = new Image("notify1.jpg");
-	private final Image ICON_NOTIFY2 = new Image("notify2.jpg");
+	private NotificationHelper notificationHelper;
 
 	@Override
 	public void start(Stage stage) {
 		this.stage = stage;
+		this.notificationHelper = new NotificationHelper(stage);
+		
 		// Get the logger for "org.jnativehook" and set the level to warning.
 		Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
 		logger.setLevel(Level.WARNING);
 
 		// Don't forget to disable the parent handlers.
 		logger.setUseParentHandlers(false);
-
-		executerService = Executors.newScheduledThreadPool(1);
 
 		createUi(stage);
 	}
@@ -137,43 +134,13 @@ public class MainApp extends Application {
 		} catch (NativeHookException ex) {
 			Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
 		}
-		executerService.shutdown();
+		notificationHelper.dispose();
 		super.stop();
 	}
 
 	public void onScreenshotSaved() {
 		Logger.getLogger("Main").log(Level.INFO, "onScreenshotSaved()");
-		final ObjectWrapper<Image> defaultImageWrapper = new ObjectWrapper<>();
-		
-		Platform.runLater(() -> {
-			defaultImageWrapper.setValue(stage.getIcons().remove(0));
-			stage.getIcons().add(ICON_NOTIFY1);
-		});
-		int timing = 175;
-		int limit = 4;
-		for (int i = 1; i <= limit; i++) {
-			if (i % 2 == 1) {
-				executerService.schedule(() -> {
-					Platform.runLater(() -> {
-						stage.getIcons().remove(0);
-						stage.getIcons().add(ICON_NOTIFY2);
-					});
-				}, timing * i, TimeUnit.MILLISECONDS);
-			} else {
-				executerService.schedule(() -> {
-					Platform.runLater(() -> {
-						stage.getIcons().remove(0);
-						stage.getIcons().add(ICON_NOTIFY1);
-					});
-				}, timing * i, TimeUnit.MILLISECONDS);
-			}
-		}
-		executerService.schedule(() -> {
-			Platform.runLater(() -> {
-				stage.getIcons().remove(0);
-				stage.getIcons().add(defaultImageWrapper.getValue());
-			});
-		}, timing * (limit + 1), TimeUnit.MILLISECONDS);
+		notificationHelper.notifyUser();
 	}
 
 	/**
