@@ -5,7 +5,9 @@
  */
 package at.jakobwoegerbauer.easyscreenshothelper;
 
+import com.sun.istack.internal.logging.Logger;
 import java.util.Observable;
+import java.util.logging.Level;
 import org.jnativehook.mouse.NativeMouseEvent;
 import org.jnativehook.mouse.NativeMouseListener;
 
@@ -19,6 +21,7 @@ public class GlobalMouseListener extends Observable implements NativeMouseListen
 	public void nativeMouseClicked(NativeMouseEvent nme) {		
 		setChanged();
 		notifyObservers(nme);
+		//java.util.logging.Logger.getLogger("XXXXXXXXXXXXXXXXXXXXX").log(Level.INFO, "CLICKCNT: " + nme.getClickCount());
 	}
 
 	@Override
